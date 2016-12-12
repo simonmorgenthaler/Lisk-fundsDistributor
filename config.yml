@@ -1,0 +1,49 @@
+# Please read README.txt for instructions how to configure your distributions.
+# This distribution is a minimum configuration that distributes all except 100 LSK,
+# and sends 1% of that amount as a donation to cc001 :)
+# If you don't want to make that donation, just remove/change it and define your own distributions
+# Please make sure that the spacing and intents are correct, they are important in .yml-files.
+
+default:
+    Sender:
+        # Add here a host where you want to send the api commands to. I recommend to use your own node.
+        # I strongly recommend to use only nodes that are pretected with SSL (https://....)
+        # because your secret passphrase needs to be submitted to this node to be able to vote.
+        # Make sure to not put a '/' at the end of it
+        # Example:
+        # Host: "https://login.lisk.io"
+        Host: "REPLACE_ME"
+        
+        # Add here the address of the account from where you want to send the transactions
+        # Example:
+        # Address: "12312352346456L"
+        Address: "REPLACE_ME"
+        
+        # Add here the PublicKey of your account
+        # Example:
+        # PublicKey: "234234645jfweijf9384rz76gr39ehg938th283th398gh94ghb832gb9238gbwiegb83f"
+        PublicKey: "REPLACE_ME"
+        
+        # Add here your secret passphrase of the account you want to use to vote
+        # The passphrase is needed to be able to send transactions
+        # If you leave it empty like this: Secret: "", the script will ask you on the prompt to enter it during runtime.
+        # Of course this can not be used when run by cron
+        # Secret: "word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12" 
+        Secret: "REPLACE_ME"
+        
+        # Add here your second passphrase if you configured it. If no second passphrase is configured, remove it completely.
+        # If you leave it empty like this: SecondSecret: "", the script will ask you on the prompt to enter it during runtime.
+        # Of course this can not be used when run by cron
+        # Example:
+        # mySecondSecret: "other1 other2 other3 other4 other5 other6 other7 other8 other9 other10 other11 other12" 
+        SecondSecret: "REPLACE_ME"
+    
+    Distribution:
+        Style: "AllExcept"
+        Amount: 100
+    
+    Distribution_Main:
+        - type: "direct"
+          value: "9959711110222257320L"
+          amount: "1%"
+          description: "Donations - cc001"
