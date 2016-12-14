@@ -290,7 +290,7 @@ priceUsd = getPriceUsd()
 
 print template.format("Balance:", str(totalAmount / SATOSHIS))
 print template.format("Fee per transaction:", str(transactionFee / SATOSHIS))
-print template.format("Amount to distribute:", str(distributedAmount / SATOSHIS) + " (" + str(config['Distribution']['Style']) + ": " + str(config['Distribution']['Amount']) + ")")
+print template.format("Amount to distribute:", str(distributedAmount / SATOSHIS) + " LSK (" + str(distributedAmount / SATOSHIS * float(priceUsd)) + " USD) - (" + str(config['Distribution']['Style']) + ": " + str(config['Distribution']['Amount']) + ")")
 print template.format("LSK/USD", str(priceUsd));
 print ""
 
