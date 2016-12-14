@@ -297,7 +297,7 @@ print template.format("LSK/USD", str(priceUsd));
 print ""
 
 if distributedAmount <= 0:
-    print "ERROR: distributed Amount <= 0:", str(distributedAmount / SATOSHIS)
+    print "ERROR: distributed Amount is negative:", str(distributedAmount / SATOSHIS)
     error = True
 elif distributedAmount > totalAmount:
     print "ERROR: distributed Amount is bigger than the available balance:", str(distributedAmount / SATOSHIS)
