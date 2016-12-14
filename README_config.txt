@@ -42,12 +42,18 @@ default:
 
 
     # Define here how much of your current account balance should be distributed.
-    # There are two possibilities how to define it: What percentage of the current balance should be distributed,
-    # or what amount should be left inside the account as a reserve.
-    # Case 1: Distribute a specific percentage -> the following example distributes 90% of the current balance
+    # There are three possibilities how to define it: What fix amount should be distributed, what percentage of the current balance
+    # should be distributed, or what amount should be left inside the account as a reserve.
+    #
+    # Case 1: Distribute a fixed amount -> the following example distributes 250 LSK (if there is enough in the wallet)
+    #     Style: "Fix"
+    #     Amount: 250
+    #    
+    # Case 2: Distribute a specific percentage -> the following example distributes 90% of the current balance
     #     Style: "Percentage"
     #     Amount: 90%
-    # Case 2: Leave only a given amount in the account -> the following example distributes everything, except 100 LSK
+    #
+    # Case 3: Leave only a given amount in the account -> the following example distributes everything, except 100 LSK
     #     Style: "AllExcept"
     #     Amount: 100
     Distribution:
