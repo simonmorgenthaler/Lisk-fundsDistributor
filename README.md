@@ -24,7 +24,7 @@ non-interactively, for example with 'cron'.
 
 ## Information
 The default configuration sends 1% of your distributed funds to my donations account 9959711110222257320L. :)
-If you don't want to send such a donation, of course you simple and remove or modify it!
+If you don't want to send such a donation, of course you simpley can remove or modify it!
 
 ## Screenshot
 ![Screenshot](screenshot.png?raw=true "Screenshot")
