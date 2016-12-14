@@ -69,7 +69,9 @@ def getDistributedAmount(totalAmount):
     if distributionStyle == "Percentage":
         distributedAmount = totalAmount * getFloatAmount(distributionAmount) / 100
     elif distributionStyle == "AllExcept":
-        distributedAmount = totalAmount - int(distributionAmount * SATOSHIS)
+        distributedAmount = totalAmount - getFloatAmount(distributionAmount) * SATOSHIS
+    elif distributionStyle == "Fix":
+        distributedAmount = getFloatAmount(distributionAmount) * SATOSHIS
     else:
         print "Error: Unknown Distribution-Style in config.yml"
     return distributedAmount
@@ -296,6 +298,9 @@ print ""
 
 if distributedAmount <= 0:
     print "ERROR: distributed Amount <= 0:", str(distributedAmount / SATOSHIS)
+    error = True
+elif distributedAmount > totalAmount:
+    print "ERROR: distributed Amount is bigger than the available balance:", str(distributedAmount / SATOSHIS)
     error = True
 else:
     calculateDistributions(distributedAmount, "Distribution_Main")
