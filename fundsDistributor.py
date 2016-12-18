@@ -299,11 +299,35 @@ def callApi(api):
 def help():
     print "You need to append the desired config section"
     print "Example:", sys.argv[0], "cc001_test"
-
+    
+def updateConfigFile():
+    
+    filename = "config.yml"    
+    replacements = {'"direct"':'"direct_percentage"', '"group"':'"group_percentage"'}
+    foundOldStrings = False
+    for old in replacements.keys():
+        if old in open(filename).read():
+            foundOldStrings = True
+            break
+    
+    if foundOldStrings:
+        file_in = open(filename).read()
+        file_out = open(filename, 'w')
+        for old in replacements.keys():
+            file_in = file_in.replace(old, replacements[old])
+        file_out.write(file_in)
+        file_out.close
+        print ""
+        print ATTENTION + "Found old version of config.yml Updated to the new version. Everything OK" + STANDARD
+        print ""
+        
 def readConfig():
+    
+    updateConfigFile()
+    
     global config, interactiveMode
     with open("config.yml", 'r') as ymlfile:
-        configuration = yaml.load(ymlfile)    
+        configuration = yaml.load(ymlfile)
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', action='store', dest='configsection', default="default", help="Use the CONFIGSECTION in config.yml. If omitted, section 'default' is used")
