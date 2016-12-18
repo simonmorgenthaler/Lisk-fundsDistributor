@@ -33,6 +33,7 @@ import getpass
 
 OK = '\033[92m'
 ERROR = '\033[91m'
+ATTENTION = '\033[93m'
 STANDARD = '\033[0m'
 
 SATOSHIS = 100000000.0
