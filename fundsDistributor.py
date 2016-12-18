@@ -99,30 +99,74 @@ def getPriceUsd():
 
 def verifyConfiguredValues(distributionSection, sectionName):
     correct = True
-    total = 0
+    totalPercentage = 0
     for distribution in distributionSection:
-        total += getFloatAmount(distribution['amount'])
-    if total > 100:
-        print "ERROR: invalid total amount in section", sectionName, ":", str(total)
+        if distribution['type'] == "direct_percentage" or distribution['type'] == "group_percentage":
+            totalPercentage += getFloatAmount(distribution['amount'])
+    if totalPercentage > 100:
+        print "ERROR: invalid total percentage in section", sectionName, ":", str(totalPercentage)
         correct = False
     return correct
-
+    
+def groupContainsFixedAmounts(DistributionSection):
+    groupContainsFixedAmounts = False
+    for distribution in DistributionSection:
+        if distribution['type'] == "direct_fixed" or distribution['type'] == "group_fixed":
+           groupContainsFixedAmounts = True
+           break
+    return groupContainsFixedAmounts
+    
+def getTotalFixedAmount(DistributionSection):
+    totalFixedAmount = 0
+    for distribution in DistributionSection:
+        if distribution['type'] == "direct_fixed" or distribution['type'] == "group_fixed":
+           totalFixedAmount += getFloatAmount(distribution['amount']) * SATOSHIS
+    return totalFixedAmount
+    
 def calculateDistributions(distributedAmount, section):
     global error
     DistributionSection = config[section]
     if not verifyConfiguredValues(DistributionSection, section):
         error = True
         return
-
-    for distribution in DistributionSection:
-        if distribution['type'] == "direct":
-            realAmount = distributedAmount*getFloatAmount(distribution['amount'])/100 - transactionFee
+        
+    totalFixedAmount = getTotalFixedAmount(DistributionSection)
+    if totalFixedAmount > distributedAmount:
+        print "ERROR: Fixed amount is bigger than the distributed amount for this group (" + section + "). Not executing these transactions"
+        error = True
+        return
+    
+    ## Loop first over fixed amounts, remove them from amounts to distribute
+    for distribution in DistributionSection:    
+        if distribution['type'] == "direct_fixed":
+            amount = getFloatAmount(distribution['amount'])
+            if amount <= 0:
+                continue
+            realAmount = amount * SATOSHIS - transactionFee
             addTransaction(realAmount, distribution['value'], distribution['description'])
-        elif distribution['type'] == "group":
-            groupAmount = distributedAmount*getFloatAmount(distribution['amount'])/100
+            distributedAmount -= realAmount + transactionFee
+        elif distribution['type'] == "group_fixed":
+            amount = getFloatAmount(distribution['amount'])
+            if amount <= 0:
+                continue
+            groupAmount = amount * SATOSHIS
             calculateDistributions(groupAmount, distribution['value'])
-        else:
-            print "ERROR: unknown distribution-type:", distribution['type']
+            distributedAmount -= groupAmount
+  
+    ## Loop over percentages
+    for distribution in DistributionSection:
+        if distribution['type'] == "direct_percentage":
+            amount = getFloatAmount(distribution['amount'])
+            if amount <= 0:
+                continue
+            realAmount = distributedAmount*amount/100 - transactionFee
+            addTransaction(realAmount, distribution['value'], distribution['description'])
+        elif distribution['type'] == "group_percentage":
+            amount = getFloatAmount(distribution['amount'])
+            if amount <= 0:
+                continue
+            groupAmount = distributedAmount*amount/100
+            calculateDistributions(groupAmount, distribution['value'])
 
 def getFloatAmount(amount):
     return float(str(amount).rstrip('%'))
