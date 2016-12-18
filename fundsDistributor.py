@@ -270,7 +270,10 @@ def executeTransactions(transactions):
         except requests.exceptions.RequestException as e:
             print "ERROR"
     
-        
+    distributedPercentage = (distributionResults['DistributedAmount'] + distributionResults['TotalFees']) / float(distributedAmount) * 100.0
+    print "-------------|--------------|--------------|-----------------------|-----------------------------------------|---------------------------------------"
+    print template.format(float(distributionResults['DistributedAmount']/SATOSHIS), float(distributionResults['DistributedAmount']/SATOSHIS)*float(priceUsd), distributedPercentage, "", "", "")
+                
     return distributionResults
     
 def calculateTotalDistributions(transactions):
