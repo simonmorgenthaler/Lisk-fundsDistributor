@@ -70,7 +70,7 @@ def getDistributedAmount(totalAmount):
         distributedAmount = totalAmount * getFloatAmount(distributionAmount) / 100
     elif distributionStyle == "AllExcept":
         distributedAmount = totalAmount - getFloatAmount(distributionAmount) * SATOSHIS
-    elif distributionStyle == "Fix":
+    elif distributionStyle == "Fixed":
         distributedAmount = getFloatAmount(distributionAmount) * SATOSHIS
     else:
         print "Error: Unknown Distribution-Style in config.yml"
