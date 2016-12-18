@@ -8,7 +8,7 @@ default:
     Sender:
         # Add here a host where you want to send the api commands to. I recommend to use your own node.
         # I strongly recommend to use only nodes that are pretected with SSL (https://....)
-        # because your secret passphrase needs to be submitted to this node to be able to vote.
+        # because your secret passphrase needs to be submitted to this node to be able to execute transactions.
         # Make sure to not put a '/' at the end of it
         # Example:
         # Host: "https://login.lisk.io"
@@ -24,14 +24,15 @@ default:
         # PublicKey: "234234645jfweijf9384rz76gr39ehg938th283th398gh94ghb832gb9238gbwiegb83f"
         PublicKey: "REPLACE_ME"
         
-        # Add here your secret passphrase of the account you want to use to vote
+        # Add here your secret passphrase of the account you want to send the transactions from
         # The passphrase is needed to be able to send transactions
         # If you leave it empty like this: Secret: "", the script will ask you on the prompt to enter it during runtime.
         # Of course this can not be used when run by cron
         # Secret: "word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12" 
         Secret: "REPLACE_ME"
         
-        # Add here your second passphrase if you configured it. If no second passphrase is configured, remove it completely.
+        # Add here your second passphrase if you configured it.
+        # If no second passphrase is configured, remove it completely.
         # If you leave it empty like this: SecondSecret: "", the script will ask you on the prompt to enter it during runtime.
         # Of course this can not be used when run by cron
         # Example:
