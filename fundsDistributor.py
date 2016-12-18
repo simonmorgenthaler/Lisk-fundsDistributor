@@ -176,7 +176,10 @@ def addTransaction(amount, address, description):
     
 def checkConfirmation():
     print ""
-    answer = raw_input("Is this ok? Should the transactions be executed? [y/n]: ").lower()
+    if SIMULATION:
+        answer = raw_input("Is this ok? Should the transactions be executed? (SIMULATION! No real transactions will be executed) [y/n]: ").lower()
+    else:
+        answer = raw_input("Is this ok? Should the transactions be executed? [y/n]: ").lower()
     execute = False
     if answer == 'y' or answer == 'yes':
         execute = True
