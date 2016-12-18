@@ -1,7 +1,7 @@
 # You can define multiple sections. This can be used to make different kind of distributions from different accounts or nodes.
 # 'default' is the main section, that is executed if nothing additionally is defined. If you want to execute another section,
 # add it with the flag "-c" to the program call like this: "./fundsDistributor.py -c <my-own-section>
-# You can add as many sections as you want. They need the parts "Sender", "Distribution", and "Distribution_Main".
+# You can add as many sections as you want. They need at least the parts "Sender", "Distribution", and "Distribution_Main".
 # They can contain additional subgroups.
 # Please make sure that the spacing and intents are correct and exact, they are important in .yml-files.
 
@@ -9,7 +9,7 @@ default:
     Sender:
         # Add here a host where you want to send the api commands to. I recommend to use your own node.
         # I strongly recommend to use only nodes that are pretected with SSL (https://....)
-        # because your secret passphrase needs to be submitted to this node to be able to vote.
+        # because your secret passphrase needs to be submitted to this node to be able to execute transactions.
         # Make sure to not put a '/' at the end of it
         # Example:
         # Host: "https://login.lisk.io"
@@ -25,7 +25,7 @@ default:
         # PublicKey: "234234645jfweijf9384rz76gr39ehg938th283th398gh94ghb832gb9238gbwiegb83f"
         PublicKey: "REPLACE_ME"
         
-        # Add here your secret passphrase of the account you want to use to vote
+        # Add here your secret passphrase of the account you want to send the transactions from
         # The passphrase is needed to be able to send transactions
         # If you leave it empty like this: Secret: "", the script will ask you on the prompt to enter it during runtime.
         # Of course this can not be used when run by cron
@@ -40,13 +40,14 @@ default:
         # mySecondSecret: "other1 other2 other3 other4 other5 other6 other7 other8 other9 other10 other11 other12" 
         SecondSecret: "REPLACE_ME"
 
-
+    
+    # "Distribution:" is a mandatory part 
     # Define here how much of your current account balance should be distributed.
-    # There are three possibilities how to define it: What fix amount should be distributed, what percentage of the current balance
+    # There are three possibilities how to define it: What fixed amount should be distributed, what percentage of the current balance
     # should be distributed, or what amount should be left inside the account as a reserve.
     #
     # Case 1: Distribute a fixed amount -> the following example distributes 250 LSK (if there is enough in the wallet)
-    #     Style: "Fix"
+    #     Style: "Fixed"
     #     Amount: 250
     #    
     # Case 2: Distribute a specific percentage -> the following example distributes 90% of the current balance
@@ -56,22 +57,48 @@ default:
     # Case 3: Leave only a given amount in the account -> the following example distributes everything, except 100 LSK
     #     Style: "AllExcept"
     #     Amount: 100
+    #
+    # Example, distributes everything except 100 LSK:
     Distribution:
         Style: "AllExcept"
         Amount: 100
     
-    # Mandatory Main Group. Leave it as "Distribution_Main". This is the starting point.
+    # "Distribution_Main:" is the mandatory main group. Leave it as "Distribution_Main". This is the starting point.
     # Add multiple elements, consisting of "type", "value", "amount" and "description".
-    # There are two possibilites for an element. Either a subgroup, that contains again several elements or a direct transaction,
-    # 1. for a subgroup, define the following:
-    #     type: "group"
-    #     value: "Distribution_mySubgroup" -> that can be defined freely
-    #     amount: "90%" -> percentage of the allocated amount of this group
-    # 2. for a direct transaction, define the following:
-    #     type: "direct"
-    #     value: "12345678L" -> Account to send the amount to
-    #     amount: "30%" -> percentage of the allocated amount of this group to send to this account
+    # There are four possibilites for an element:
+    # Either a subgroup, that contains again several elements, defined as a fixed value or a percentage value
+    # or a direct transaction, also defined with a fixed value or a percentage
+    
+    # 1. for a subgroup with a percentage value, define the following ("description" is not needed):
+    #     type: "group_percentage"
+    #     value: "Distribution_mySubgroup" -> that is the name of another part. it can be defined freely
+    #     amount: "90%"                    -> percentage of the allocated amount of this group
+    #
+    # 2. for a subgroup with a fixed value, use the following template:
+    #     type: "group_fixed"
+    #     value: "Distribution_mySubgroup" -> that is the name of another part
+    #     amount: 500                      -> 500 LSK will be allocated to that group
+    #
+    # 3. for a direct transaction with a percentage value, define the following:
+    #     type: "direct_percentage"
+    #     value: "12345678L"                  -> Account to send the amount to
+    #     amount: "30%"                       -> percentage of the allocated amount of this group to send to this account
     #     description: "Servers -Maintenance" -> just a description, needed only for the log
+    #
+    # 4. for a direct transaction with a fixed value, define the following:
+    #     type: "direct_fixed"
+    #     value: "12345678L"                  -> Account to send the amount to
+    #     amount: 200                         -> send 200 LSK to this account
+    #     description: "Servers -Maintenance" -> just a description, needed only for the log
+
+    # Percentage values in one group should add up to 100%. If they are bigger than 100%, they won't be executed
+    # If they are smaller than 100%, they will be executed.
+    # Fixed amounts are executed only if enough funds are available. They are executed first and substracted from the allocated
+    # amount to this group. The rest is distributed accordingly to the defined percentages.
+    # Example: If allcate 1000LSK to a group, which contains a fixed transaction of 200LSK, one of 40% and one of 60%,
+    # the following transactions will be executed:
+    # 200LSK (fixed), 320LSK (40% of 800LSK, which is left after 200 are substracted from 1000), and 480 (60% of 800)
+
     # Subgroups can contain again direct transactions or subgroubs. that creates a kind of a hierarchy.
     # Every subgroup takes the amount allocated to it again as 100% to distribute it further.
 
@@ -80,24 +107,24 @@ default:
     # the script will distribute 900 LSK, according to the allocations in Distribution_Main.
     
     # This will make the following:
-    #  * A direct transaction to the donation account of cc001 of 9 LSK (1% of 900 LSK)
-    #  * Allocate 180 LSK (20% of 900) to the group Distribution_Servers (see below)
-    #  * Allocate 225 LSK (25% of 900) to the group Distribution_Donations (see below)
-    #  * Allocate 486 LSK (54% of 900) to the group Distribution_Servers (see below)
+    #  * Allocate 180 LSK (fixed) to the group Distribution_Servers (see below)
+    #  * A direct transaction to the donation account of cc001 of 36 LSK (5% of 720LSK (900 - 180))
+    #  * Allocate 216 LSK (30% of 720) to the group Distribution_Donations (see below)
+    #  * Allocate 468 LSK (65% of 720) to the group Distribution_Servers (see below)
     Distribution_Main:
-        - type: "direct"
+        - type: "direct_percentage"
           value: "9959711110222257320L"
-          amount: 1%
+          amount: 5%
           description: "Donations - cc001"
-        - type: "group"
+        - type: "group_fixed"
           value: "Distribution_Servers"
-          amount: 20
-        - type: "group"
+          amount: 180
+        - type: "group_percentage"
           value: "Distribution_Donations"
-          amount: 25
-        - type: "group"
+          amount: 30%
+        - type: "group_percentage"
           value: "Distribution_Private"
-          amount: 54   
+          amount: 65%   
    
     # This group receives 180 LSK to distribute. Because it contains only one direct transaction of 100%, it executes the following:
     #  * Send 180 LSK to the Account with the number <Addr-Server-Maintenance>
@@ -107,10 +134,10 @@ default:
           amount: 100%
           description: "Servers -Maintenance"
 
-    # This group receives 225 LSK to distribute. It executes the following:
-    #  * Send 45 LSK (20% of 225 LSK) to the Account with the number <Addr-Community-Fund>
-    #  * Send 67.5 LSK (30% of 225 LSK) to the Account with the number <Addr-User-Fund>
-    #  * Send 112.5 LSK (50% of 225 LSK) to the Account with the number <Addr-Project-Fund>
+    # This group receives 216 LSK to distribute. It executes the following:
+    #  * Send 43.2 LSK (20% of 216 LSK) to the Account with the number <Addr-Community-Fund>
+    #  * Send 64.8 LSK (30% of 216 LSK) to the Account with the number <Addr-User-Fund>
+    #  * Send 108 LSK (50% of 216 LSK) to the Account with the number <Addr-Project-Fund>
     Distribution_Donations:
         - type: "direct"
           value: "<Addr-Community-Fund>"
@@ -125,21 +152,21 @@ default:
           amount: 50%
           description: "Donations - Project Fund"
 
-    # This group receives 486 LSK to distribute. It executes the following:
-    #  * Send 160.38 LSK (33% of 486 LSK) to the Account with the number <Addr-Voting-Account>
-    #  * Send 160.38 LSK (33% of 486 LSK) to the Account with the number <Addr-Savings-Account>
-    #  * Send 165.24 LSK (34% of 486 LSK) to the Account with the number <Addr-Wage-Account>
+    # This group receives 468 LSK to distribute. It executes the following:
+    #  * Send 150 LSK (fixed) to the Account with the number <Addr-Voting-Account>
+    #  * Send 159 LSK (50% of 318 LSK) to the Account with the number <Addr-Savings-Account>
+    #  * Send 159 LSK (50% of 318 LSK) to the Account with the number <Addr-Wage-Account>
     Distribution_Private:
-        - type: "direct"
+        - type: "direct_fixed"
           value: "<Addr-Voting-Account>"
-          amount: 33%
+          amount: 150
           description: "Private Payout - Voting Account"
         - type: "direct"
           value: "<Addr-Savings-Account>"
-          amount: 33%
+          amount: 50%
           description: "Private Payout - Savings Account"
         - type: "direct"
           value: "<Addr-Wage-Account>"
-          amount: 34%
+          amount: 50%
           description: "Private Payout - Wage Account"
 
