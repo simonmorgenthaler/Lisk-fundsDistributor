@@ -247,7 +247,7 @@ def executeTransactions(transactions):
             else:
                 payload = {
                     'secret' : config['Sender']['Secret'],
-                    'amount' : int(transaction['Amount']),
+                    'amount' : int(round(transaction['Amount'])),
                     'recipientId' : transaction['Address']
                 }
                 if 'SecondSecret' in config['Sender']:
@@ -257,7 +257,7 @@ def executeTransactions(transactions):
                 
             if 'success' in answer and answer['success']:
                 result = OK + "SUCCESS: (TxId: " + answer['transactionId'] + ")" + STANDARD
-                distributionResults['DistributedAmount'] += int(transaction['Amount'])
+                distributionResults['DistributedAmount'] += int(round(transaction['Amount']))
                 distributionResults['SuccessfulTransactions'] += 1
                 distributionResults['TotalFees'] += transactionFee
             else:
