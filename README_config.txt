@@ -50,11 +50,13 @@ default:
     #     Style: "Fixed"
     #     Amount: 250
     #    
-    # Case 2: Distribute a specific percentage -> the following example distributes 90% of the current balance
+    # Case 2: Distribute a specific percentage -> the following example distributes 90% of the current balance (don't use 100%,
+    #         Or the transaction fees can't be covered. I suggest to distribute at max 99%
     #     Style: "Percentage"
     #     Amount: 90%
     #
-    # Case 3: Leave only a given amount in the account -> the following example distributes everything, except 100 LSK
+    # Case 3: Leave only a given amount in the account -> the following example distributes everything, except 100 LSK. I suggest to
+    #         keep always some LSK, or the transaction fees can't be covered.
     #     Style: "AllExcept"
     #     Amount: 100
     #
