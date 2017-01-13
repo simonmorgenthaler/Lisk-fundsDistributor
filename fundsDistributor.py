@@ -146,9 +146,9 @@ def calculateDistributions(distributedAmount, section):
             amount = getFloatAmount(distribution['amount'])
             if amount <= 0:
                 continue
-            realAmount = amount * SATOSHIS - transactionFee
+            realAmount = amount * SATOSHIS
             addTransaction(realAmount, distribution['value'], distribution['description'])
-            distributedAmount -= realAmount + transactionFee
+            distributedAmount -= realAmount
         elif distribution['type'] == "group_fixed":
             amount = getFloatAmount(distribution['amount'])
             if amount <= 0:
@@ -173,7 +173,7 @@ def calculateDistributions(distributedAmount, section):
             amount = getFloatAmount(distribution['amount'])
             if amount <= 0:
                 continue
-            realAmount = distributedAmount*amount/100 - transactionFee
+            realAmount = distributedAmount*amount/100
             addTransaction(realAmount, distribution['value'], distribution['description'])
         elif distribution['type'] == "group_percentage":
             amount = getFloatAmount(distribution['amount'])
@@ -228,7 +228,7 @@ def transactionPreview(transactions):
     print "-------------|--------------|--------------|-----------------------|-----------------------------------------|---------------------------------------"
     for transaction in transactions:
       if distributedAmount != 0:
-          percentage = float(transaction['Amount']+transactionFee) / float(distributedAmount) * 100.0
+          percentage = float(transaction['Amount']) / float(distributedAmount) * 100.0
       else:
           percentage = 0
       print template.format(transaction['Amount']/SATOSHIS, float(transaction['Amount']/SATOSHIS)*float(priceUsd), percentage, transaction['Address'], transaction['Description'], "")
@@ -285,14 +285,14 @@ def executeTransactions(transactions):
                 result = ERROR + "FAILURE: (" + answer['error'] + ")" + STANDARD
                 distributionResults['FailedTransactions'] += 1
             
-            percentage = float(transaction['Amount']+transactionFee) / float(distributedAmount) * 100.0
+            percentage = float(transaction['Amount']) / float(distributedAmount) * 100.0
             
             print template.format(transaction['Amount']/SATOSHIS, float(transaction['Amount']/SATOSHIS)*float(priceUsd), percentage, transaction['Address'], transaction['Description'], result)
             
         except requests.exceptions.RequestException as e:
             print "ERROR"
     
-    distributedPercentage = (distributionResults['DistributedAmount'] + distributionResults['TotalFees']) / float(distributedAmount) * 100.0
+    distributedPercentage = (distributionResults['DistributedAmount']) / float(distributedAmount) * 100.0
     print "-------------|--------------|--------------|-----------------------|-----------------------------------------|---------------------------------------"
     print template.format(float(distributionResults['DistributedAmount']/SATOSHIS), float(distributionResults['DistributedAmount']/SATOSHIS)*float(priceUsd), distributedPercentage, "", "", "")
                 
