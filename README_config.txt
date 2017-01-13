@@ -65,9 +65,9 @@ default:
     
     # "Distribution_Main:" is the mandatory main group. Leave it as "Distribution_Main". This is the starting point.
     # Add multiple elements, consisting of "type", "value", "amount" and "description".
-    # There are four possibilites for an element:
+    # There are five possibilites for an element:
     # Either a subgroup, that contains again several elements, defined as a fixed value or a percentage value
-    # or a direct transaction, also defined with a fixed value or a percentage
+    # or a direct transaction, also defined with a fixed value or a percentage, or a text file that contains the distribution
     
     # 1. for a subgroup with a percentage value, define the following ("description" is not needed):
     #     type: "group_percentage"
@@ -90,6 +90,16 @@ default:
     #     value: "12345678L"                  -> Account to send the amount to
     #     amount: 200                         -> send 200 LSK to this account
     #     description: "Servers -Maintenance" -> just a description, needed only for the log
+    #
+    # 5. for a textfile with the distributions, define the following (example.csv is a valid example file):
+    #     type: "file_fixed"
+    #     value: "example.csv"                -> Filename that contains your distribution. You can also use a relative or 
+    #                                            absolute path
+    #                                            See the file example.csv to find out how the file must look like. It is a csv file.
+    #                                            First row (column names) must be exactly as in the example file. Then put every 
+    #                                            Transaction on a separate line in the following format:
+    #                                            <Amount>;<ReceiverAddress>;"<Description (only for documentation>"
+
 
     # Percentage values in one group should add up to 100%. If they are bigger than 100%, they won't be executed
     # If they are smaller than 100%, they will be executed.
