@@ -30,6 +30,7 @@ import yaml
 import time
 import argparse
 import getpass
+import csv
 
 OK = '\033[92m'
 ERROR = '\033[91m'
@@ -112,7 +113,7 @@ def verifyConfiguredValues(distributionSection, sectionName):
 def groupContainsFixedAmounts(DistributionSection):
     groupContainsFixedAmounts = False
     for distribution in DistributionSection:
-        if distribution['type'] == "direct_fixed" or distribution['type'] == "group_fixed":
+        if distribution['type'] == "direct_fixed" or distribution['type'] == "group_fixed" or distribution['type'] == "file_fixed":
            groupContainsFixedAmounts = True
            break
     return groupContainsFixedAmounts
@@ -121,7 +122,9 @@ def getTotalFixedAmount(DistributionSection):
     totalFixedAmount = 0
     for distribution in DistributionSection:
         if distribution['type'] == "direct_fixed" or distribution['type'] == "group_fixed":
-           totalFixedAmount += getFloatAmount(distribution['amount']) * SATOSHIS
+            totalFixedAmount += getFloatAmount(distribution['amount']) * SATOSHIS
+        elif distribution['type'] == "file_fixed":
+            totalFixedAmount += getFloatAmountFromCsvFile(distribution['value']) * SATOSHIS
     return totalFixedAmount
     
 def calculateDistributions(distributedAmount, section):
@@ -153,6 +156,16 @@ def calculateDistributions(distributedAmount, section):
             groupAmount = amount * SATOSHIS
             calculateDistributions(groupAmount, distribution['value'])
             distributedAmount -= groupAmount
+        elif distribution['type'] == "file_fixed":
+            filename = distribution['value']
+            with open(filename, 'rb') as csvfile:
+                csvreader = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+                for row in csvreader:
+                    amount = getFloatAmount(row['amount'])
+                    if amount <= 0:
+                        continue
+                    realAmount = amount * SATOSHIS
+                    addTransaction(realAmount, row['address'], row['description'])
   
     ## Loop over percentages
     for distribution in DistributionSection:
@@ -171,6 +184,14 @@ def calculateDistributions(distributedAmount, section):
 
 def getFloatAmount(amount):
     return float(str(amount).rstrip('%'))
+    
+def getFloatAmountFromCsvFile(filename):
+    amount = 0.0
+    with open(filename, 'rb') as csvfile:
+        csvreader = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+        for row in csvreader:
+            amount += float(row['amount'])
+    return amount
 
 def addTransaction(amount, address, description):
     transactions.append({'Amount': amount, 'Address': address, 'Description': description})
