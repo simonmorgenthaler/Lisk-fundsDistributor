@@ -79,7 +79,8 @@ def getDistributedAmount(totalAmount):
     return distributedAmount
 
 def getPriceUsd():
-    #query = "https://api.coinmarketcap.com/v1/ticker/lisk/"
+    priceUSD = 0
+    #query = "https://api.coinmarketcap.com/v1/ticker/lisk/" #coinmarketcap
     query = "https://explorer.lisk.io/api/getPriceTicker"
     answer = ""
     try:
@@ -91,12 +92,10 @@ def getPriceUsd():
         print "Not allowed"
         answer = []
     
-    if not answer:
-        priceUSD = 0
-    else:
+    if answer and 'success' in answer and answer['success'] and 'LSK' in answer['tickers'] and 'USD' in answer['tickers']['LSK']:
+        priceUSD = answer['tickers']['LSK']['USD']
         #priceUSD = answer[0]['price_usd'] # coinmarketcap
-        priceUSD = answer['lisk_usd']
-    
+
     return priceUSD
 
 def verifyConfiguredValues(distributionSection, sectionName):
